@@ -1,19 +1,48 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-    </View>
-  );
+import List from './List'
+import Input from './Input'
+import Title from './Title'
+
+export default class App extends Component {
+
+  state = {
+    todos:[
+      'click to remove','Learn React Native','Write Code','Ship App'
+    ]
+  }
+  onAddTodo = (text) => {
+    const {todos} = this.state
+    this.setState({
+      todos:[text, ...todos]
+    })
+  }
+  onRemoveTodo = (index) => {
+    const {todos} = this.state
+    this.setState({
+      todos: todos.filter((todo, i) => i !== index),
+    })
+  }
+
+  render(){
+    const { todos } = this.state
+    return (
+      <View>
+        <Title>
+          To-do List
+        </Title>
+        <Input
+        placeholder={'Type a todo, then hit enter!'}
+        onSubmitEditing={this.onAddTodo}
+        />
+        <List
+        list={todos}
+        onPressItem={this.onRemoveTodo}
+        />
+      </View>
+    );
+  }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+

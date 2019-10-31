@@ -1,40 +1,54 @@
-import React, { Component } from 'react'
-import { Text } from 'react-native'
-import { createStore } from 'redux'
+import React from 'react'
+import { View } from 'react-native'
 
-// Define action types
-const types = {
-  INCREMENT: 'INCREMENT',
-}
+import { actionCreators } from './todoListRedux'
+import List from './List'
+import Input from './Input'
+import Title from './Title'
 
-// Define a reducer
-const reducer = (state, action) => {
-  if (action.type === types.INCREMENT) {
-    return {count: state.count + 1}
+import store from './store'
+
+export default class App extends React.Component {
+
+  state = {}
+  unsubscribe = store.subscribe(() => {
+    const {todos} = store.getState()
+    this.setState({todos})
+  }) 
+  componentWillMount() {
+    const todos = store.getState().todos
+    this.setState({todos})
   }
-  return state
-}
 
-// Define the initial state of our store
-const initialState = {count: 0}
+  componentWillUnmount() {
+   unsubscribe()
+  }
 
-// Create a store, passing our reducer function and our initial state
-const store = createStore(reducer, initialState)
+  onAddTodo = (text) => {
+    store.dispatch(actionCreators.add(text))
+  }
 
+  onRemoveTodo = (index) => {
+    store.dispatch(actionCreators.remove(index))
+  }
 
-/// We're done! Redux is all set up. Here's how we can use it:
+  render() {
+    const {todos} = this.state
 
-
-// Now we can dispatch actions, which are understood by our store/reducer
-store.dispatch({type: types.INCREMENT})
-store.dispatch({type: types.INCREMENT})
-store.dispatch({type: types.INCREMENT})
-
-// Calling `store.getState()` returns our state object
-export default function App() {
-  return (
-    <Text style={{fontSize: 100}}>
-      {store.getState().count}
-    </Text>
-  )
+    return (
+      <View>
+        <Title>
+          To-Do List
+        </Title>
+        <Input
+          placeholder={'Type a todo, then hit enter!'}
+          onSubmitEditing={this.onAddTodo}
+        />
+        <List
+          list={todos}
+          onPressItem={this.onRemoveTodo}
+        />
+      </View>
+    )
+  }
 }
